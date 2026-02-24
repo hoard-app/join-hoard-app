@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hoard — Your Collection, Curated</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Tenor+Sans&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F5F0E8;
+    --warm-white: #FAF8F3;
+    --sand: #E8DFD0;
+    --clay: #C4A882;
+    --earth: #8B6F47;
+    --bark: #4A3728;
+    --ink: #1C1410;
+    --accent: #9B7E5A;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Tenor Sans', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ── */
+  nav {
+    padding: 24px 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+
+  /* ── HERO / WAITLIST ── */
+  .hero {
+    padding: 40px 24px 80px;
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+    animation: fadeUp 0.9s 0.1s both;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: clamp(48px, 11vw, 80px);
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--earth);
+  }
+
+  .hero-sub {
+    font-family: var(--font-display);
+    font-size: clamp(16px, 3vw, 20px);
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--bark);
+    max-width: 480px;
+    margin: 0 auto 40px;
+  }
+
+  /* Waitlist box */
+  .waitlist-block {
+    background: var(--warm-white);
+    border: 1px solid var(--sand);
+    border-radius: 6px;
+    padding: 28px 24px;
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 4px 40px rgba(28,20,16,0.07);
+  }
+
+  .waitlist-social {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--earth);
+    margin-bottom: 16px;
+  }
+
+  .waitlist-social strong { font-weight: 400; color: var(--ink); }
+
+  .waitlist-avatars {
+    display: inline-flex;
+    gap: -6px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--warm-white);
+    background: var(--sand);
+    display: inline-block;
+    margin-left: -6px;
+    font-size: 10px;
+    line-height: 20px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .avatar:first-child { margin-left: 0; }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .waitlist-form {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  @media (min-width: 460px) {
+    .waitlist-form { flex-direction: row; }
+  }
+
+  .waitlist-input {
+    flex: 1;
+    font-family: var(--font-body);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    background: var(--cream);
+    border: 1px solid var(--sand);
+    border-radius: 3px;
+    padding: 13px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+
+  .waitlist-input::placeholder { color: var(--clay); }
+  .waitlist-input:focus { border-color: var(--earth); }
+
+  .waitlist-btn {
+    font-family: var(--font-body);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--warm-white);
+    background: var(--bark);
+    border: none;
+    border-radius: 3px;
+    padding: 13px 22px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, transform 0.15s;
+    -webkit-appearance: none;
+  }
+
+  .waitlist-btn:hover { background: var(--ink); }
+  .waitlist-btn:active { transform: scale(0.97); }
+
+  .waitlist-fine {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-top: 14px;
+    text-align: center;
+  }
+
+  /* success */
+  .success-msg {
+    display: none;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--earth);
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .divider-line { flex: 1; height: 1px; background: var(--sand); }
+
+  .divider-text {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--clay);
+    white-space: nowrap;
+  }
+
+  /* ── MARQUEE ── */
+  .marquee-strip {
+    background: var(--bark);
+    padding: 12px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 48px 0;
+  }
+
+  .marquee-inner {
+    display: inline-block;
+    animation: marquee 22s linear infinite;
+  }
+
+  .marquee-inner span {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--clay);
+    letter-spacing: 0.1em;
+    margin: 0 24px;
+  }
+
+  .marquee-inner span::after {
+    content: '·';
+    margin-left: 24px;
+    color: var(--earth);
+  }
+
+  /* ── CONTENT SECTIONS ── */
+  .content-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .section {
+    padding: 64px 0;
+  }
+
+  .section + .section {
+    border-top: 1px solid var(--sand);
+  }
+
+  .section-label {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 8vw, 48px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+
+  .section-title em { font-style: italic; color: var(--earth); }
+
+  .section-body {
+    font-family: var(--font-display);
+    font-size: clamp(16px, 3vw, 18px);
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--bark);
+  }
+
+  /* Steps */
+  .steps { margin-top: 40px; }
+
+  .step {
+    display: flex;
+    gap: 20px;
+    padding: 24px 0;
+    border-top: 1px solid var(--sand);
+  }
+
+  .step:last-child { border-bottom: 1px solid var(--sand); }
+
+  .step-num {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--sand);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 44px;
+  }
+
+  .step-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .step-desc {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--bark);
+  }
+
+  /* Features */
+  .features {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .feature {
+    background: var(--warm-white);
+    border: 1px solid var(--sand);
+    border-radius: 4px;
+    padding: 20px;
+  }
+
+  .feature-icon { font-size: 22px; margin-bottom: 10px; }
+
+  .feature-title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .feature-desc {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--bark);
+  }
+
+  /* Quote */
+  .quote-wrap {
+    background: var(--bark);
+    border-radius: 4px;
+    padding: 40px 32px;
+    text-align: center;
+    margin-top: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quote-wrap::before {
+    content: '\201C';
+    font-family: var(--font-display);
+    font-size: 180px;
+    color: rgba(196,168,130,0.1);
+    position: absolute;
+    top: -30px; left: 8px;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .quote-text {
+    font-family: var(--font-display);
+    font-size: clamp(18px, 4vw, 22px);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--cream);
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .quote-attr {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--clay);
+  }
+
+  /* Gallery image strip */
+  .image-strip {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 4px;
+    margin-top: 36px;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 220px;
+  }
+
+  .image-strip img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: sepia(12%);
+    transition: transform 0.5s ease;
+  }
+
+  .image-strip img:hover { transform: scale(1.04); }
+
+  /* Footer CTA */
+  .footer-cta {
+    text-align: center;
+    padding: 72px 24px 48px;
+    border-top: 1px solid var(--sand);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .footer-cta .section-title { margin-bottom: 12px; }
+
+  .footer-cta .section-body { margin-bottom: 28px; }
+
+  .btn-link {
+    font-family: var(--font-body);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--earth);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  footer {
+    background: var(--ink);
+    padding: 36px 24px 44px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+
+  .footer-tag {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--clay);
+    margin-bottom: 24px;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .footer-links a {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--earth);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--cream); }
+
+  .footer-copy {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--earth);
+    opacity: 0.6;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Hoard</div>
+</nav>
+
+<!-- HERO + WAITLIST -->
+<section class="hero">
+  <p class="hero-eyebrow">Digital Gallery · For Collectors</p>
+  <h1 class="hero-headline">
+    Collect.<br><em>Curate.</em><br>Share.
+  </h1>
+  <p class="hero-sub">
+    A minimalist digital gallery where collectors become curators. Create collections, label each piece beautifully, and share a profile that feels premium.
+  </p>
+
+  <!-- Waitlist -->
+  <div class="waitlist-block">
+    <p class="waitlist-social">Your gallery is almost ready. Join the waitlist.</p>
+    <div class="waitlist-form" id="form">
+      <input class="waitlist-input" type="email" placeholder="Enter your email" id="emailInput" autocomplete="email" />
+      <button class="waitlist-btn" onclick="handleSubmit()">Request Access</button>
+    </div>
+    <div class="success-msg" id="successMsg">
+      You're on the list. We'll be in touch ✦
+    </div>
+    <p class="waitlist-fine">Free to join · No spam, ever</p>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span>Ceramics</span><span>Vintage Posters</span><span>Photography</span><span>Sneakers</span><span>Vinyl Records</span><span>Paintings</span><span>Books</span><span>Watches</span><span>Sculpture</span><span>Ceramics</span><span>Vintage Posters</span><span>Photography</span><span>Sneakers</span><span>Vinyl Records</span><span>Paintings</span><span>Books</span><span>Watches</span><span>Sculpture</span>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content-wrap">
+
+  <!-- What is Hoard -->
+  <div class="section reveal">
+    <p class="section-label">What is Hoard</p>
+    <h2 class="section-title">Your taste is<br><em>your identity.</em></h2>
+    <p class="section-body">
+      Hoard is built for people who collect with intention. Whether it's ceramics, cameras, or limited editions — every piece tells a story. We give that story a home worth sharing.
+    </p>
+
+    <div class="image-strip">
+      <img src="https://images.unsplash.com/photo-1594736797933-d0501ba2fe65?w=600&q=80" alt="Ceramics" />
+      <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&q=80" alt="Vintage camera" />
+      <img src="https://images.unsplash.com/photo-1603048588665-791ca8aea617?w=400&q=80" alt="Vinyl record" />
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="section reveal">
+    <p class="section-label">How It Works</p>
+    <h2 class="section-title">Three steps<br>to <em>beautiful.</em></h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div>
+          <div class="step-title">Add your pieces</div>
+          <p class="step-desc">Upload photos, name each item, and add labels. Every piece gets its own card.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div>
+          <div class="step-title">Build collections</div>
+          <p class="step-desc">Group by theme, era, or mood. Arrange them exactly how you'd hang them on a wall.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div>
+          <div class="step-title">Share your profile</div>
+          <p class="step-desc">One link to your gallery. Clean, premium, entirely yours. No ads, no noise.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section reveal">
+    <p class="section-label">Why Hoard</p>
+    <h2 class="section-title">Built for<br><em>people with taste.</em></h2>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">🖼️</div>
+        <div class="feature-title">Gallery-grade display</div>
+        <p class="feature-desc">Your items presented with the care of a museum exhibit.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">✏️</div>
+        <div class="feature-title">Beautiful labelling</div>
+        <p class="feature-desc">Add provenance, notes, year, and stories to each piece.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔗</div>
+        <div class="feature-title">One shareable link</div>
+        <p class="feature-desc">Your entire collection, accessible anywhere, on any device.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🚫</div>
+        <div class="feature-title">Zero ads, ever</div>
+        <p class="feature-desc">Your gallery is yours. We never sell space inside it.</p>
+      </div>
+    </div>
+
+    <div class="quote-wrap">
+      <p class="quote-text">"I built Hoard because my collection deserved better than a camera roll."</p>
+      <p class="quote-attr">— Rui Durão · Founder, Lisbon</p>
+    </div>
+  </div>
+
+  <!-- Footer CTA -->
+  <div class="footer-cta reveal">
+    <h2 class="section-title">Your collection<br><em>deserves this.</em></h2>
+    <p class="section-body">Free to start. Ready in minutes.</p>
+    <br>
+    <button class="waitlist-btn" style="padding:15px 32px;font-size:11px;" onclick="document.querySelector('.waitlist-input').focus();window.scrollTo({top:0,behavior:'smooth'})">
+      Join the Waitlist
+    </button>
+    <br><br>
+
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Hoard</div>
+  <div class="footer-tag">Your collection, curated.</div>
+  <div class="footer-links">
+    <a href="#">About</a>
+    <a href="#">Privacy</a>
+    <a href="#">Instagram</a>
+  </div>
+  <div class="footer-copy">© 2026 Hoard. All rights reserved.</div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(el => {
+      if (el.isIntersecting) el.target.classList.add('visible');
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Waitlist submit
+  function handleSubmit() {
+    const input = document.getElementById('emailInput');
+    const email = input.value.trim();
+    if (!email || !email.includes('@')) {
+      input.style.borderColor = 'var(--earth)';
+      input.focus();
+      return;
+    }
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+  }
+
+  document.getElementById('emailInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleSubmit();
+  });
+</script>
+
+</body>
+</html>

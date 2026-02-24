@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Hoard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Tenor+Sans&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F5F0E8;
+    --warm-white: #FAF8F3;
+    --sand: #E8DFD0;
+    --clay: #C4A882;
+    --earth: #8B6F47;
+    --bark: #4A3728;
+    --ink: #1C1410;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Tenor Sans', sans-serif;
+  }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--sand);
+    background: rgba(245, 240, 232, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-back {
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--earth);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-back:hover { color: var(--ink); }
+
+  .wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 64px 24px 100px;
+  }
+
+  .page-label {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 8vw, 52px);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .last-updated {
+    font-family: var(--font-body);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--clay);
+    margin-bottom: 56px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--sand);
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 44px 0 12px;
+  }
+
+  p {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--bark);
+    margin-bottom: 16px;
+  }
+
+  a {
+    color: var(--earth);
+    text-underline-offset: 3px;
+  }
+
+  a:hover { color: var(--ink); }
+
+  .highlight {
+    background: var(--warm-white);
+    border: 1px solid var(--sand);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin: 32px 0;
+  }
+
+  .highlight p {
+    margin-bottom: 0;
+    font-size: 15px;
+  }
+
+  footer {
+    background: var(--ink);
+    padding: 36px 24px 44px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+
+  .footer-tag {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--clay);
+    margin-bottom: 24px;
+  }
+
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .footer-links a {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--earth);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--cream); }
+
+  .footer-copy {
+    font-family: var(--font-body);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--earth);
+    opacity: 0.6;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">Hoard</a>
+  <a class="nav-back" href="index.html">← Back</a>
+</nav>
+
+<div class="wrap">
+
+  <p class="page-label">Legal</p>
+  <h1>Privacy Policy</h1>
+  <p class="last-updated">Last updated: March 2026</p>
+
+  <div class="highlight">
+    <p>The short version: we collect your email when you join the waitlist. We use it only to contact you about Hoard. We never sell it. That's it.</p>
+  </div>
+
+  <h2>Who we are</h2>
+  <p>Hoard is a minimalist digital gallery for collectors, currently in pre-launch. It is operated by Rui Durão, based in Lisbon, Portugal. You can reach us at <a href="mailto:support@hoard-app.com">support@hoard-app.com</a>.</p>
+
+  <h2>What data we collect</h2>
+  <p>When you join our waitlist, we collect your email address. That is the only personal data we collect at this stage. We do not collect names, phone numbers, payment information, or any other personal data unless you provide it voluntarily by emailing us.</p>
+
+  <h2>Why we collect it</h2>
+  <p>We collect your email address solely to notify you when Hoard launches and to send you occasional updates about the product. We will not send you unrelated marketing or share your email with third parties for their own marketing purposes.</p>
+
+  <h2>Legal basis (GDPR)</h2>
+  <p>If you are located in the European Economic Area, our legal basis for collecting and processing your email address is your consent, which you give when you submit the waitlist form. You may withdraw this consent at any time by contacting us.</p>
+
+  <h2>Who has access to your data</h2>
+  <p>Your email address is stored and managed by <a href="https://loops.so" target="_blank">Loops</a>, a third-party email platform. Loops acts as a data processor on our behalf and is contractually prohibited from using your data for any other purpose. You can review their privacy practices at <a href="https://loops.so/privacy" target="_blank">loops.so/privacy</a>.</p>
+
+  <h2>How long we keep your data</h2>
+  <p>We keep your email address for as long as you are on our waitlist or until you ask us to remove it. If Hoard does not launch, we will delete all waitlist data within 12 months.</p>
+
+  <h2>Your rights</h2>
+  <p>Under GDPR, you have the right to access, correct, or delete your personal data at any time. You also have the right to withdraw consent and to lodge a complaint with your local data protection authority (in Portugal, this is the <a href="https://www.cnpd.pt" target="_blank">CNPD</a>).</p>
+  <p>To exercise any of these rights, simply email us at <a href="mailto:support@hoard-app.com">support@hoard-app.com</a> and we will respond within 30 days.</p>
+
+  <h2>Cookies</h2>
+  <p>This website does not use cookies or any tracking technologies at this stage.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If we make material changes to this policy, we will update the date at the top of this page. As our product evolves, this policy will be updated to reflect any new data practices.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy? Email us at <a href="mailto:support@hoard-app.com">support@hoard-app.com</a>.</p>
+</div>
+
+<footer>
+  <div class="footer-logo">Hoard</div>
+  <div class="footer-tag">Your collection, curated.</div>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="hoard-privacy.html">Privacy</a>
+    <a href="#">Instagram</a>
+  </div>
+  <div class="footer-copy">© 2026 Hoard. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
