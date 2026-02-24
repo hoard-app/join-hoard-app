@@ -560,10 +560,10 @@
   <!-- Waitlist -->
   <div class="waitlist-block">
     <p class="waitlist-social">Your gallery is almost ready. Join the waitlist.</p>
-    <div class="waitlist-form" id="form">
-      <input class="waitlist-input" type="email" placeholder="Enter your email" id="emailInput" autocomplete="email" />
-      <button class="waitlist-btn" onclick="handleSubmit()">Request Access</button>
-    </div>
+    <form class="waitlist-form" id="form" action="https://app.loops.so/api/newsletter-form/cmm16pv17019o0i23tvqyzjyu" method="POST" onsubmit="handleSubmit(event)">
+      <input class="waitlist-input" type="email" name="email" placeholder="Enter your email" id="emailInput" autocomplete="email" required />
+      <button class="waitlist-btn" type="submit">Request Access</button>
+    </form>
     <div class="success-msg" id="successMsg">
       You're on the list. We'll be in touch ✦
     </div>
@@ -697,22 +697,29 @@
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // Waitlist submit
-  function handleSubmit() {
+  async function handleSubmit(event) {
+    if (event) event.preventDefault();
     const input = document.getElementById('emailInput');
     const email = input.value.trim();
-    if (!email || !email.includes('@')) {
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+    if (!valid) {
       input.style.borderColor = 'var(--earth)';
       input.focus();
       return;
     }
+    try {
+      await fetch('https://app.loops.so/api/newsletter-form/cmm16pv17019o0i23tvqyzjyu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `email=${encodeURIComponent(email)}`
+      });
+    } catch (e) {}
     document.getElementById('form').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
   }
-
   document.getElementById('emailInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') handleSubmit();
   });
 </script>
-
 </body>
 </html>
