@@ -557,19 +557,21 @@
     A minimalist digital gallery where collectors become curators. Create collections, label each piece beautifully, and share a profile that feels premium.
   </p>
 
-  <!-- Waitlist -->
-  <div class="waitlist-block">
-    <p class="waitlist-social">Your gallery is almost ready. Join the waitlist.</p>
-    <form class="waitlist-form" id="form" action="https://app.loops.so/api/newsletter-form/cmm16pv17019o0i23tvqyzjyu" method="POST" onsubmit="handleSubmit(event)">
-      <input class="waitlist-input" type="email" name="email" placeholder="Enter your email" id="emailInput" autocomplete="email" required />
-      <button class="waitlist-btn" type="submit">Request Access</button>
-    </form>
-    <div class="success-msg" id="successMsg">
-      You're on the list. We'll be in touch ✦
-    </div>
-    <p class="waitlist-fine">Free to join · No spam, ever</p>
+<!-- Waitlist -->
+<div class="waitlist-block">
+  <p class="waitlist-social">Your gallery is almost ready. Join the waitlist.</p>
+  <form class="waitlist-form" id="form" onsubmit="handleSubmit(event)">
+    <input class="waitlist-input" type="email" name="email" placeholder="Enter your email" id="emailInput" autocomplete="email" required />
+    <button class="waitlist-btn" type="submit">Request Access</button>
+  </form>
+  <div class="success-msg" id="successMsg" style="display:none;">
+    <p>You're on the list ✦</p>
+    <p style="font-size:13px;opacity:0.6;margin:8px 0 4px;">Share your link to earn badges:</p>
+    <p id="referralLink" style="font-size:13px;word-break:break-all;"></p>
+    <button onclick="copyLink()" style="margin-top:8px;cursor:pointer;">Copy link</button>
   </div>
-</section>
+  <p class="waitlist-fine">Free to join · No spam, ever</p>
+</div>
 
 <!-- MARQUEE -->
 <div class="marquee-strip">
@@ -697,29 +699,47 @@
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // Waitlist submit
-  async function handleSubmit(event) {
-    if (event) event.preventDefault();
-    const input = document.getElementById('emailInput');
-    const email = input.value.trim();
-    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
-    if (!valid) {
-      input.style.borderColor = 'var(--earth)';
-      input.focus();
-      return;
+function getReferralCodeFromURL() {
+  return new URLSearchParams(window.location.search).get('ref') || '';
+}
+
+async function handleSubmit(event) {
+  if (event) event.preventDefault();
+  const input = document.getElementById('emailInput');
+  const email = input.value.trim();
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  if (!valid) {
+    input.style.borderColor = 'var(--earth)';
+    input.focus();
+    return;
+  }
+  try {
+    const res = await fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, referredBy: getReferralCodeFromURL() })
+    });
+    const data = await res.json();
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+    if (data.referralLink) {
+      document.getElementById('referralLink').textContent = data.referralLink;
     }
-    try {
-      await fetch('https://app.loops.so/api/newsletter-form/cmm16pv17019o0i23tvqyzjyu', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `email=${encodeURIComponent(email)}`
-      });
-    } catch (e) {}
+  } catch (e) {
     document.getElementById('form').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
   }
-  document.getElementById('emailInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleSubmit();
+}
+
+function copyLink() {
+  const link = document.getElementById('referralLink').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.querySelector('#successMsg button');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy link', 2000);
   });
-</script>
-</body>
-</html>
+}
+
+document.getElementById('emailInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') handleSubmit();
+});
