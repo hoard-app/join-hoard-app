@@ -1,40 +1,34 @@
 // api/waitlist.js — Vercel Serverless Function
-// Handles: signup, referral tracking, badge milestones, Loops contact creation + transactional email
 
 const LOOPS_API_KEY = process.env.LOOPS_API_KEY;
-const LOOPS_TRANSACTIONAL_ID = process.env.LOOPS_TRANSACTIONAL_ID; // Confirmation email sent on signup
-const LOOPS_BADGE_TRANSACTIONAL_ID = process.env.LOOPS_BADGE_TRANSACTIONAL_ID; // Badge unlock email
-const BASE_URL = process.env.BASE_URL; // e.g. https://hoardapp.co
+const LOOPS_TRANSACTIONAL_ID = process.env.LOOPS_TRANSACTIONAL_ID;
+const LOOPS_BADGE_TRANSACTIONAL_ID = process.env.LOOPS_BADGE_TRANSACTIONAL_ID;
+const BASE_URL = process.env.BASE_URL;
 
-// Badge milestones
-// Add more tiers here if needed in the future
-const BADGE_MILESTONES = {
-  1: "bronze",
-  2: "silver",
-  3: "gold",
-};
+const BADGE_MILESTONES = { 1: "bronze", 2: "silver", 3: "gold" };
 
 function getBadge(referralCount) {
-  // Return the highest badge earned, or null if none yet
   const earned = Object.entries(BADGE_MILESTONES)
     .filter(([threshold]) => referralCount >= Number(threshold))
     .map(([, badge]) => badge);
   return earned.length ? earned[earned.length - 1] : null;
 }
 
-// Generate a short, unique referral code from email
-function generateReferralCode(email) {
-  let hash = 0;
-  const str = email.toLowerCase().trim();
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash).toString(36).toUpperCase().slice(0, 7);
+// Encode referrer email into URL-safe base64
+function encodeRef(email) {
+  return Buffer.from(email.toLowerCase().trim()).toString("base64url");
 }
 
-export default async function handler(req, res) {
-  // CORS headers — adjust origin to your domain in production
+// Decode ref param back to email
+function decodeRef(ref) {
+  try {
+    return Buffer.from(ref, "base64url").toString("utf8");
+  } catch {
+    return null;
+  }
+}
+
+module.exports = async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -48,11 +42,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Valid email required" });
   }
 
-  const referralCode = generateReferralCode(email);
-  const referralLink = `${BASE_URL}?ref=${referralCode}`;
+  // Referral link encodes the user's own email so we can look them up directly
+  const refCode = encodeRef(email);
+  const referralLink = `${BASE_URL}?ref=${refCode}`;
 
   try {
-    // 1. Create contact in Loops with custom properties
+    // 1. Create contact in Loops
     const createRes = await fetch("https://app.loops.so/api/v1/contacts/create", {
       method: "POST",
       headers: {
@@ -63,8 +58,6 @@ export default async function handler(req, res) {
         email,
         source: "waitlist",
         subscribed: true,
-        // Custom properties — must be created in Loops dashboard first (see README)
-        referralCode,
         referralLink,
         referredBy: referredBy || "",
         referralCount: 0,
@@ -74,14 +67,13 @@ export default async function handler(req, res) {
 
     const createData = await createRes.json();
 
-    // Handle duplicate signup gracefully
     if (!createRes.ok && createRes.status !== 409) {
-      console.error("Loops create error:", createData);
+      console.error("Loops create error:", JSON.stringify(createData));
       return res.status(500).json({ error: "Failed to join waitlist. Please try again." });
     }
 
-    // 2. Send confirmation email with referral link
-    await fetch("https://app.loops.so/api/v1/transactional", {
+    // 2. Send confirmation email
+    const emailRes = await fetch("https://app.loops.so/api/v1/transactional", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOOPS_API_KEY}`,
@@ -92,40 +84,48 @@ export default async function handler(req, res) {
         email,
         dataVariables: {
           referralLink,
-          referralCode,
           unsubscribeUrl: "",
         },
       }),
     });
 
-    // 3. If this signup came via a referral, update the referrer's count + badge
+    const emailData = await emailRes.json();
+    if (!emailRes.ok) {
+      console.error("Confirmation email error:", JSON.stringify(emailData));
+    }
+
+    // 3. If referred, decode referrer email directly and update them
     if (referredBy) {
-      await updateReferrer(referredBy);
+      const referrerEmail = decodeRef(referredBy);
+      if (referrerEmail && referrerEmail.includes("@")) {
+        await updateReferrer(referrerEmail);
+      } else {
+        console.warn("Could not decode referrer from:", referredBy);
+      }
     }
 
     return res.status(200).json({
       success: true,
-      referralCode,
       referralLink,
       alreadySignedUp: createRes.status === 409,
     });
 
   } catch (err) {
-    console.error("Waitlist error:", err);
+    console.error("Waitlist error:", err.message);
     return res.status(500).json({ error: "Something went wrong. Please try again." });
   }
-}
+};
 
-// Helper: find referrer by referralCode, increment their count, assign badge if milestone hit
-async function updateReferrer(referralCode) {
+async function updateReferrer(referrerEmail) {
   try {
-    const searchRes = await fetch(
-      `https://app.loops.so/api/v1/contacts/find?referralCode=${referralCode}`,
+    // Find referrer directly by email
+    const findRes = await fetch(
+      `https://app.loops.so/api/v1/contacts/find?email=${encodeURIComponent(referrerEmail)}`,
       { headers: { Authorization: `Bearer ${LOOPS_API_KEY}` } }
     );
 
-    if (!searchRes.ok) return;
-    const contacts = await searchRes.json();
+    if (!findRes.ok) return;
+    const contacts = await findRes.json();
     if (!contacts.length) return;
 
     const referrer = contacts[0];
@@ -135,7 +135,7 @@ async function updateReferrer(referralCode) {
     const newBadge = getBadge(newCount) || previousBadge;
     const badgeUnlocked = newBadge !== previousBadge;
 
-    // Update referrer contact with new count and badge
+    // Update referrer count and badge
     await fetch("https://app.loops.so/api/v1/contacts/update", {
       method: "PUT",
       headers: {
@@ -143,13 +143,13 @@ async function updateReferrer(referralCode) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: referrer.email,
+        email: referrerEmail,
         referralCount: newCount,
         badge: newBadge,
       }),
     });
 
-    // Send badge unlock email only when a new milestone is crossed
+    // Send badge email if milestone crossed
     if (badgeUnlocked && LOOPS_BADGE_TRANSACTIONAL_ID) {
       await fetch("https://app.loops.so/api/v1/transactional", {
         method: "POST",
@@ -159,16 +159,16 @@ async function updateReferrer(referralCode) {
         },
         body: JSON.stringify({
           transactionalId: LOOPS_BADGE_TRANSACTIONAL_ID,
-          email: referrer.email,
+          email: referrerEmail,
           dataVariables: {
-            badge: newBadge,           // "bronze" | "silver" | "gold"
+            badge: newBadge,
             referralCount: newCount,
+            unsubscribeUrl: "",
           },
         }),
       });
     }
   } catch (err) {
-    console.error("Failed to update referrer:", err);
-    // Non-fatal — don't block the signup response
+    console.error("updateReferrer error:", err.message);
   }
 }
