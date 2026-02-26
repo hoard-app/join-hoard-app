@@ -14,18 +14,15 @@ function getBadge(referralCount) {
   return earned.length ? earned[earned.length - 1] : null;
 }
 
-// Encode referrer email into URL-safe base64
-function encodeRef(email) {
-  return Buffer.from(email.toLowerCase().trim()).toString("base64url");
-}
-
-// Decode ref param back to email
-function decodeRef(ref) {
-  try {
-    return Buffer.from(ref, "base64url").toString("utf8");
-  } catch {
-    return null;
+// Short deterministic code from email — used as both referral code and Loops userId
+function generateReferralCode(email) {
+  let hash = 0;
+  const str = email.toLowerCase().trim();
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
   }
+  return Math.abs(hash).toString(36).toUpperCase().slice(0, 7);
 }
 
 export default async function handler(req, res) {
@@ -42,12 +39,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Valid email required" });
   }
 
-  // Referral link encodes the user's own email so we can look them up directly
-  const refCode = encodeRef(email);
-  const referralLink = `${BASE_URL}?ref=${refCode}`;
+  const referralCode = generateReferralCode(email);
+  const referralLink = `${BASE_URL}?ref=${referralCode}`;
 
   try {
-    // 1. Create contact in Loops
+    // 1. Create contact — store referralCode as userId for fast lookup later
     const createRes = await fetch("https://app.loops.so/api/v1/contacts/create", {
       method: "POST",
       headers: {
@@ -56,6 +52,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         email,
+        userId: referralCode,   // ← key: enables fast find?userId= lookup
         source: "waitlist",
         subscribed: true,
         referralLink,
@@ -89,19 +86,14 @@ export default async function handler(req, res) {
       }),
     });
 
-    const emailData = await emailRes.json();
     if (!emailRes.ok) {
-      console.error("Confirmation email error:", JSON.stringify(emailData));
+      const emailErr = await emailRes.json();
+      console.error("Confirmation email error:", JSON.stringify(emailErr));
     }
 
-    // 3. If referred, decode referrer email directly and update them
+    // 3. If referred, look up referrer by userId (their referral code) and update badge
     if (referredBy) {
-      const referrerEmail = decodeRef(referredBy);
-      if (referrerEmail && referrerEmail.includes("@")) {
-        await updateReferrer(referrerEmail);
-      } else {
-        console.warn("Could not decode referrer from:", referredBy);
-      }
+      await updateReferrer(referredBy);
     }
 
     return res.status(200).json({
@@ -114,13 +106,13 @@ export default async function handler(req, res) {
     console.error("Waitlist error:", err.message);
     return res.status(500).json({ error: "Something went wrong. Please try again." });
   }
-};
+}
 
-async function updateReferrer(referrerEmail) {
+async function updateReferrer(referralCode) {
   try {
-    // Find referrer directly by email
+    // Find referrer by userId = their referralCode — fast and reliable
     const findRes = await fetch(
-      `https://app.loops.so/api/v1/contacts/find?email=${encodeURIComponent(referrerEmail)}`,
+      `https://app.loops.so/api/v1/contacts/find?userId=${referralCode}`,
       { headers: { Authorization: `Bearer ${LOOPS_API_KEY}` } }
     );
 
@@ -135,7 +127,6 @@ async function updateReferrer(referrerEmail) {
     const newBadge = getBadge(newCount) || previousBadge;
     const badgeUnlocked = newBadge !== previousBadge;
 
-    // Update referrer count and badge
     await fetch("https://app.loops.so/api/v1/contacts/update", {
       method: "PUT",
       headers: {
@@ -143,13 +134,12 @@ async function updateReferrer(referrerEmail) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email: referrerEmail,
+        email: referrer.email,
         referralCount: newCount,
         badge: newBadge,
       }),
     });
 
-    // Send badge email if milestone crossed
     if (badgeUnlocked && LOOPS_BADGE_TRANSACTIONAL_ID) {
       await fetch("https://app.loops.so/api/v1/transactional", {
         method: "POST",
@@ -159,7 +149,7 @@ async function updateReferrer(referrerEmail) {
         },
         body: JSON.stringify({
           transactionalId: LOOPS_BADGE_TRANSACTIONAL_ID,
-          email: referrerEmail,
+          email: referrer.email,
           dataVariables: {
             badge: newBadge,
             referralCount: newCount,
