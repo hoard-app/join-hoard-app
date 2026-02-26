@@ -93,6 +93,7 @@ export default async function handler(req, res) {
         dataVariables: {
           referralLink,
           referralCode,
+          unsubscribeUrl: "",
         },
       }),
     });
